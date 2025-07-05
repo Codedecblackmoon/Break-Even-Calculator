@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Calculator, TrendingUp, DollarSign, Package, Plus, Trash2, Download, BarChart3, AlertCircle, RefreshCw } from 'lucide-react';
 
+
+
 // TypeScript interfaces
 interface Expense {
   id: string;
@@ -36,12 +38,15 @@ interface ScenarioAnalysis {
   profitMargin: number;
 }
 
+
 const BreakEvenCalculator: React.FC = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [products, setProducts] = useState<ProductClass[]>([]);
   const [results, setResults] = useState<BreakEvenResult[]>([]);
   const [scenarioAnalysis, setScenarioAnalysis] = useState<ScenarioAnalysis[]>([]);
   const [activeTab, setActiveTab] = useState<'expenses' | 'products' | 'results' | 'scenarios'>('expenses');
+
+
 
   // Form states
   const [newExpense, setNewExpense] = useState({
@@ -62,6 +67,17 @@ const BreakEvenCalculator: React.FC = () => {
     'Operations', 'Marketing', 'Sales', 'Technology', 'HR', 'Legal', 'Finance', 'Other'
   ];
 
+  const [expenseErrors, setExpenseErrors] = useState({
+  name: '',
+  amount: ''
+  });
+
+  const [productErrors, setProductErrors] = useState({
+    name: '',
+    price: '',
+    variableCostPerUnit: ''
+  });
+
   // Calculate totals
   const totalFixedCosts = expenses
     .filter(e => e.type === 'fixed')
@@ -73,33 +89,92 @@ const BreakEvenCalculator: React.FC = () => {
 
   // Add expense
   const addExpense = () => {
-    if (newExpense.name && newExpense.amount) {
-      const expense: Expense = {
-        id: Date.now().toString(),
-        name: newExpense.name,
-        amount: parseFloat(newExpense.amount),
-        type: newExpense.type,
-        category: newExpense.category
-      };
-      setExpenses([...expenses, expense]);
-      setNewExpense({ name: '', amount: '', type: 'fixed', category: 'Operations' });
-    }
+  let isValid = true;
+  const newErrors = { name: '', amount: '' };
+
+  if (!newExpense.name.trim()) {
+    newErrors.name = 'Expense name is required';
+    isValid = false;
+  }
+
+  if (!newExpense.amount) {
+    newErrors.amount = 'Amount is required';
+    isValid = false;
+  } else if (isNaN(parseFloat(newExpense.amount))) {
+    newErrors.amount = 'Amount must be a number';
+    isValid = false;
+  } else if (parseFloat(newExpense.amount) <= 0) {
+    newErrors.amount = 'Amount must be greater than 0';
+    isValid = false;
+  }
+
+  setExpenseErrors(newErrors);
+
+  if (isValid) {
+    const expense: Expense = {
+      id: Date.now().toString(),
+      name: newExpense.name.trim(),
+      amount: parseFloat(newExpense.amount),
+      type: newExpense.type,
+      category: newExpense.category
+    };
+    setExpenses([...expenses, expense]);
+    setNewExpense({ name: '', amount: '', type: 'fixed', category: 'Operations' });
+  }
   };
 
   // Add product
   const addProduct = () => {
-    if (newProduct.name && newProduct.price && newProduct.variableCostPerUnit) {
-      const product: ProductClass = {
-        id: Date.now().toString(),
-        name: newProduct.name,
-        price: parseFloat(newProduct.price),
-        variableCostPerUnit: parseFloat(newProduct.variableCostPerUnit),
-        estimatedMonthlyVolume: parseFloat(newProduct.estimatedMonthlyVolume) || 0
-      };
-      setProducts([...products, product]);
-      setNewProduct({ name: '', price: '', variableCostPerUnit: '', estimatedMonthlyVolume: '' });
-    }
-  };
+  let isValid = true;
+  const newErrors = { name: '', price: '', variableCostPerUnit: '' };
+
+  if (!newProduct.name.trim()) {
+    newErrors.name = 'Product name is required';
+    isValid = false;
+  }
+
+  if (!newProduct.price) {
+    newErrors.price = 'Price is required';
+    isValid = false;
+  } else if (isNaN(parseFloat(newProduct.price))) {
+    newErrors.price = 'Price must be a number';
+    isValid = false;
+  } else if (parseFloat(newProduct.price) <= 0) {
+    newErrors.price = 'Price must be greater than 0';
+    isValid = false;
+  }
+
+  if (!newProduct.variableCostPerUnit) {
+    newErrors.variableCostPerUnit = 'Variable cost is required';
+    isValid = false;
+  } else if (isNaN(parseFloat(newProduct.variableCostPerUnit))) {
+    newErrors.variableCostPerUnit = 'Variable cost must be a number';
+    isValid = false;
+  } else if (parseFloat(newProduct.variableCostPerUnit) < 0) {
+    newErrors.variableCostPerUnit = 'Variable cost cannot be negative';
+    isValid = false;
+  }
+
+  if (isValid && parseFloat(newProduct.price) <= parseFloat(newProduct.variableCostPerUnit)) {
+    newErrors.price = 'Price must be greater than variable cost';
+    isValid = false;
+  }
+
+  setProductErrors(newErrors);
+
+  if (isValid) {
+    const product: ProductClass = {
+      id: Date.now().toString(),
+      name: newProduct.name.trim(),
+      price: parseFloat(newProduct.price),
+      variableCostPerUnit: parseFloat(newProduct.variableCostPerUnit),
+      estimatedMonthlyVolume: parseFloat(newProduct.estimatedMonthlyVolume) || 0
+    };
+    setProducts([...products, product]);
+    setNewProduct({ name: '', price: '', variableCostPerUnit: '', estimatedMonthlyVolume: '' });
+  }
+};
+  
 
   // Calculate break-even analysis
   useEffect(() => {
@@ -317,20 +392,31 @@ const BreakEvenCalculator: React.FC = () => {
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Add New Expense</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <input
-                  type="text"
-                  placeholder="Expense name"
-                  value={newExpense.name}
-                  onChange={(e) => setNewExpense({...newExpense, name: e.target.value})}
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="number"
-                  placeholder="Amount (R)"
-                  value={newExpense.amount}
-                  onChange={(e) => setNewExpense({...newExpense, amount: e.target.value})}
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Expense name"
+                    value={newExpense.name}
+                    onChange={(e) => setNewExpense({...newExpense, name: e.target.value})}
+                    className={`px-3 py-2 border ${expenseErrors.name ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  />
+                  {expenseErrors.name && <p className="mt-1 text-sm text-red-600">{expenseErrors.name}</p>}
+                </div>
+                
+                <div>
+                  <input
+                    type="number"
+                    placeholder="Amount (R)"
+                    value={newExpense.amount}
+                    onChange={(e) => setNewExpense({...newExpense, amount: e.target.value})}
+                    className={`px-3 py-2 border ${expenseErrors.amount ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    min="0"
+                    step="0.01"
+                  />
+                  {expenseErrors.amount && <p className="mt-1 text-sm text-red-600">{expenseErrors.amount}</p>}
+                </div>
+
+                {/* I'm going to keep the existing type and category selects exactly as they are for easier debugging. */}
                 <select
                   value={newExpense.type}
                   onChange={(e) => setNewExpense({...newExpense, type: e.target.value as 'fixed' | 'variable'})}
@@ -339,6 +425,7 @@ const BreakEvenCalculator: React.FC = () => {
                   <option value="fixed">Fixed Cost</option>
                   <option value="variable">Variable Cost</option>
                 </select>
+
                 <select
                   value={newExpense.category}
                   onChange={(e) => setNewExpense({...newExpense, category: e.target.value})}
@@ -428,33 +515,51 @@ const BreakEvenCalculator: React.FC = () => {
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Add New Product Class</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <input
-                  type="text"
-                  placeholder="Product name (e.g., Basic, Pro)"
-                  value={newProduct.name}
-                  onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="number"
-                  placeholder="Price per unit (R)"
-                  value={newProduct.price}
-                  onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="number"
-                  placeholder="Variable cost per unit (R)"
-                  value={newProduct.variableCostPerUnit}
-                  onChange={(e) => setNewProduct({...newProduct, variableCostPerUnit: e.target.value})}
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Product name (e.g., Basic, Pro)"
+                    value={newProduct.name}
+                    onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
+                    className={`px-3 py-2 border ${productErrors.name ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  />
+                  {productErrors.name && <p className="mt-1 text-sm text-red-600">{productErrors.name}</p>}
+                </div>
+                
+                <div>
+                  <input
+                    type="number"
+                    placeholder="Price per unit (R)"
+                    value={newProduct.price}
+                    onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
+                    className={`px-3 py-2 border ${productErrors.price ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    min="0.01"
+                    step="0.01"
+                  />
+                  {productErrors.price && <p className="mt-1 text-sm text-red-600">{productErrors.price}</p>}
+                </div>
+
+                <div>
+                  <input
+                    type="number"
+                    placeholder="Variable cost per unit (R)"
+                    value={newProduct.variableCostPerUnit}
+                    onChange={(e) => setNewProduct({...newProduct, variableCostPerUnit: e.target.value})}
+                    className={`px-3 py-2 border ${productErrors.variableCostPerUnit ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    min="0"
+                    step="0.01"
+                  />
+                  {productErrors.variableCostPerUnit && <p className="mt-1 text-sm text-red-600">{productErrors.variableCostPerUnit}</p>}
+                </div>
+
+                {/* Keep the existing estimated volume input exactly as it was */}
                 <input
                   type="number"
                   placeholder="Estimated monthly volume"
                   value={newProduct.estimatedMonthlyVolume}
                   onChange={(e) => setNewProduct({...newProduct, estimatedMonthlyVolume: e.target.value})}
                   className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  min="0"
                 />
               </div>
               <button
