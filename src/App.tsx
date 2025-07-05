@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calculator, TrendingUp, DollarSign, Package, Plus, Trash2, Download, BarChart3, AlertCircle, RefreshCw } from 'lucide-react';
-
+import { Document, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, AlignmentType, Packer } from "docx";
 
 
 // TypeScript interfaces
@@ -277,27 +277,245 @@ const BreakEvenCalculator: React.FC = () => {
   }, [expenses, products, totalFixedCosts, totalVariableCosts]);
 
   // Export data
-  const exportData = () => {
-    const data = {
-      expenses,
-      products,
-      results,
-      totals: {
-        totalFixedCosts,
-        totalVariableCosts,
-        totalCosts: totalFixedCosts + totalVariableCosts
-      },
-      exportDate: new Date().toISOString()
-    };
+  // const exportData = () => {
+  //   const data = {
+  //     expenses,
+  //     products,
+  //     results,
+  //     totals: {
+  //       totalFixedCosts,
+  //       totalVariableCosts,
+  //       totalCosts: totalFixedCosts + totalVariableCosts
+  //     },
+  //     exportDate: new Date().toISOString()
+  //   };
     
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `break-even-analysis-${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+  //   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  //   const url = URL.createObjectURL(blob);
+  //   const a = document.createElement('a');
+  //   a.href = url;
+  //   a.download = `break-even-analysis-${new Date().toISOString().split('T')[0]}.json`;
+  //   a.click();
+  //   URL.revokeObjectURL(url);
+  // };
+
+  
+
+      const exportAsWord = async () => {
+        try {
+          // Create document sections
+          const sections = [];
+          
+          // Add title
+          sections.push(
+            new Paragraph({
+              text: "Break-Even Analysis Report",
+              heading: HeadingLevel.HEADING_1,
+              alignment: AlignmentType.CENTER,
+              spacing: { after: 200 }
+            })
+          );
+          
+          // Add date
+          sections.push(
+            new Paragraph({
+              text: `Generated on: ${new Date().toLocaleDateString()}`,
+              alignment: AlignmentType.CENTER,
+              spacing: { after: 400 }
+            })
+          );
+          
+          // Add expenses section
+          if (expenses.length > 0) {
+            sections.push(
+              new Paragraph({
+                text: "Expenses",
+                heading: HeadingLevel.HEADING_2,
+                spacing: { after: 200 }
+              })
+            );
+            
+            // Expenses table
+            const expenseRows = [
+              new TableRow({
+                children: [
+                  new TableCell({ children: [new Paragraph("Name")], width: { size: 3000, type: WidthType.DXA } }),
+                  new TableCell({ children: [new Paragraph("Category")] }),
+                  new TableCell({ children: [new Paragraph("Type")] }),
+                  new TableCell({ children: [new Paragraph("Amount")] })
+                ]
+              }),
+              ...expenses.map(expense => 
+                new TableRow({
+                  children: [
+                    new TableCell({ children: [new Paragraph(expense.name)] }),
+                    new TableCell({ children: [new Paragraph(expense.category)] }),
+                    new TableCell({ children: [new Paragraph(expense.type)] }),
+                    new TableCell({ children: [new Paragraph(formatCurrency(expense.amount))] })
+                  ]
+                })
+              )
+            ];
+            
+            sections.push(
+              new Table({
+                rows: expenseRows,
+                width: { size: 100, type: WidthType.PERCENTAGE }
+              })
+            );
+          }
+          
+          // Add products section
+          if (products.length > 0) {
+            sections.push(
+              new Paragraph({
+                text: "Products",
+                heading: HeadingLevel.HEADING_2,
+                spacing: { before: 400, after: 200 }
+              })
+            );
+            
+            // Products table
+            const productRows = [
+              new TableRow({
+                children: [
+                  new TableCell({ children: [new Paragraph("Name")] }),
+                  new TableCell({ children: [new Paragraph("Price")] }),
+                  new TableCell({ children: [new Paragraph("Variable Cost")] }),
+                  new TableCell({ children: [new Paragraph("Est. Volume")] }),
+                  new TableCell({ children: [new Paragraph("Break-Even Units")] }),
+                  new TableCell({ children: [new Paragraph("Est. Profit")] })
+                ]
+              }),
+              ...products.map(product => {
+                const result = results.find(r => r.productId === product.id);
+                return new TableRow({
+                  children: [
+                    new TableCell({ children: [new Paragraph(product.name)] }),
+                    new TableCell({ children: [new Paragraph(formatCurrency(product.price))] }),
+                    new TableCell({ children: [new Paragraph(formatCurrency(product.variableCostPerUnit))] }),
+                    new TableCell({ children: [new Paragraph(formatNumber(product.estimatedMonthlyVolume))] }),
+                    new TableCell({ children: [new Paragraph(result ? formatNumber(result.breakEvenUnits) : "N/A")] }),
+                    new TableCell({ children: [new Paragraph(result ? formatCurrency(result.profitAtEstimatedVolume) : "N/A")] })
+                  ]
+                });
+              })
+            ];
+            
+            sections.push(
+              new Table({
+                rows: productRows,
+                width: { size: 100, type: WidthType.PERCENTAGE }
+              })
+            );
+          }
+          
+          // Add scenario analysis
+          if (scenarioAnalysis.length > 0) {
+            sections.push(
+              new Paragraph({
+                text: "Scenario Analysis",
+                heading: HeadingLevel.HEADING_2,
+                spacing: { before: 400, after: 200 }
+              })
+            );
+            
+            const scenarioRows = [
+              new TableRow({
+                children: [
+                  new TableCell({ children: [new Paragraph("Volume")] }),
+                  new TableCell({ children: [new Paragraph("Revenue")] }),
+                  new TableCell({ children: [new Paragraph("Total Costs")] }),
+                  new TableCell({ children: [new Paragraph("Profit")] }),
+                  new TableCell({ children: [new Paragraph("Margin")] })
+                ]
+              }),
+              ...scenarioAnalysis.map(scenario => 
+                new TableRow({
+                  children: [
+                    new TableCell({ children: [new Paragraph(formatNumber(scenario.volume))] }),
+                    new TableCell({ children: [new Paragraph(formatCurrency(scenario.revenue))] }),
+                    new TableCell({ children: [new Paragraph(formatCurrency(scenario.totalCosts))] }),
+                    new TableCell({ children: [new Paragraph(formatCurrency(scenario.profit))] }),
+                    new TableCell({ children: [new Paragraph(`${scenario.profitMargin.toFixed(1)}%`)] })
+                  ]
+                })
+              )
+            ];
+            
+            sections.push(
+              new Table({
+                rows: scenarioRows,
+                width: { size: 100, type: WidthType.PERCENTAGE }
+              })
+            );
+          }
+          
+          // Add summary
+          sections.push(
+            new Paragraph({
+              text: "Summary",
+              heading: HeadingLevel.HEADING_2,
+              spacing: { before: 400, after: 200 }
+            })
+          );
+          
+          const summaryRows = [
+            new TableRow({
+              children: [
+                new TableCell({ children: [new Paragraph("Total Fixed Costs")] }),
+                new TableCell({ children: [new Paragraph(formatCurrency(totalFixedCosts))] })
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({ children: [new Paragraph("Total Variable Costs")] }),
+                new TableCell({ children: [new Paragraph(formatCurrency(totalVariableCosts))] })
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({ children: [new Paragraph("Total Products")] }),
+                new TableCell({ children: [new Paragraph(products.length.toString())] })
+              ]
+            })
+          ];
+          
+          sections.push(
+            new Table({
+              rows: summaryRows,
+              width: { size: 50, type: WidthType.PERCENTAGE }
+            })
+          );
+          
+          // Create the document
+          const doc = new Document({
+            sections: [{
+              children: sections
+            }]
+          });
+          
+          // Generate and download the Word file
+          const blob = await Packer.toBlob(doc);
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `break-even-analysis-${new Date().toISOString().split('T')[0]}.docx`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          
+        } catch (error) {
+          console.error("Word export failed:", error);
+          alert("Failed to generate Word document. Please try again.");
+        }
+      };
+
+      // Update your export button to use this function
+      const exportData = () => {
+        exportAsWord();
+      };
 
     // Clear all data
   const clearAllData = () => {
@@ -347,11 +565,11 @@ const BreakEvenCalculator: React.FC = () => {
                 <span>Clear All</span>
               </button>
               <button
-                onClick={exportData}
-                className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <Download className="h-4 w-4" />
-                <span>Export Data</span>
+                  onClick={exportData}
+                  className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  title="Export as Word Document">
+                  <Download className="h-4 w-4" />
+                  <span>Export Word Doc</span>
               </button>
             </div>
           </div>
