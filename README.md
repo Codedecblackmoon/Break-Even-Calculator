@@ -112,6 +112,7 @@ cd Break-Even-Calculator
 # 3. Install the good stuff
 npm install
 npm install -D @tailwindcss/postcss tailwindcss postcss autoprefixer
+npm install docx
 
 # 4. Start the party (or cry trying)
 npm start
