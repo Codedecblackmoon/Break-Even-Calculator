@@ -49,7 +49,7 @@ Scenario planning uses different sales volumes to show:
 git clone https://github.com/your-username/break-even-calculator.git
 cd break-even-calculator
 npm install
-npm run dev
+npm start
 Then open http://localhost:5173 (or whatever port Vite/React uses).
 
 📁 File Structure
@@ -106,5 +106,29 @@ npm install -D @tailwindcss/postcss tailwindcss postcss autoprefixer
 npm install docx
 
 # 4. Start the party (or cry trying)
+npm start
+
+# If you encounter issues, try:
+npm install --legacy-peer-deps
+npm audit fix
+
+# If the above doesn't work, try:
+npm audit fix --force
+
+# 5. Start the Development Server
+npm start
+
+# 6. Troubleshooting: If npm start fails: Clear cache and reinstall
+rm -rf node_modules package-lock.json
+npm install
+npm start
+
+# 7. If you're on Windows and get permission errors:
+Run as administrator or try:
+npm config set fund false
+npm install
+
+# 8.If you get "react-scripts not found":
+npm install react-scripts@latest --save-dev
 npm start
 

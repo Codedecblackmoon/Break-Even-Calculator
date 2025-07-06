@@ -219,9 +219,6 @@ const BreakEvenCalculator: React.FC = () => {
     // Calculate total estimated volume and weighted average contribution margin
     const totalEstimatedVolume = products.reduce((sum, product) => sum + product.estimatedMonthlyVolume, 0);
     const weightedAvgContributionMargin = totalEstimatedVolume > 0 
-      // ? products.reduce((sum, product) => 
-      //     sum + (product.contributionMargin * product.estimatedMonthlyVolume), 0) / totalEstimatedVolume
-      // : 0;
       ? products.reduce((sum, product) => {
           const result = newResults.find(r => r.productId === product.id);
           return sum + ((result?.contributionMargin || 0) * product.estimatedMonthlyVolume);
@@ -581,7 +578,7 @@ const BreakEvenCalculator: React.FC = () => {
         <div className="container mx-auto px-4">
           <nav className="flex space-x-8">
             {[
-              { id: 'expenses', label: 'Expenses', icon: DollarSign },
+              { id: 'expenses', label: 'Expenses', icon: () => <span style={{ fontWeight: 'bold' }}>R</span> },
               { id: 'products', label: 'Products', icon: Package },
               { id: 'results', label: 'Results', icon: TrendingUp },
               { id: 'scenarios', label: 'Scenarios', icon: BarChart3 }
