@@ -82,25 +82,16 @@ Create a feature branch
 
 Submit a pull request describing your changes
 
-🧠 Inspiration
+Inspiration
 Inspired by real-world needs of SaaS founders, CFOs, and analysts to visualize when their product turns profitable — and how pricing, cost control, or sales volume impacts that journey.
-
-
-tips incase
-
-# 💰 Break-Even Calculator 📊
-
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Tailwind](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 
 > **Warning**  
 > This project requires special setup due to PostCSS/Tailwind conflicts.  
-> Follow these instructions **carefully** to avoid pain. 😈
+> Follow these instructions **carefully** to avoid pain.
 
 ---
 
-## 🚀 Launch Sequence (For Normies)
+## Launch Sequence (For Normies)
 
 ```bash
 # 1. Clone this glorious repository
