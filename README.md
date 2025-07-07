@@ -104,6 +104,8 @@ cd Break-Even-Calculator
 npm install
 npm install -D @tailwindcss/postcss tailwindcss postcss autoprefixer
 npm install docx
+npm install recharts
+npm install --save-dev @types/recharts
 
 # 4. Start the party (or cry trying)
 npm start
