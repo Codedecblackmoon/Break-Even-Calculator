@@ -1540,12 +1540,45 @@ const BreakEvenCalculator: React.FC = () => {
     return new Intl.NumberFormat('en-US').format(Math.round(num));
   };
 
+  // return (
+  //   <div className="min-h-screen bg-gray-50">
+  //     {/* Header */}
+  //     <div className="bg-white shadow-sm border-b">
+  //       <div className="container mx-auto px-4 py-4">
+  //         <div className="flex items-center justify-between">
+  //           <div className="flex items-center space-x-3">
+  //             <Calculator className="h-8 w-8 text-blue-600" />
+  //             <div>
+  //               <h1 className="text-2xl font-bold text-gray-900">Break-Even Calculator</h1>
+  //               <p className="text-gray-600">BulaBook's Financial Analysis Tool</p>
+  //             </div>
+  //           </div>
+  //           <div className="flex items-center space-x-3">
+  //             <button
+  //               onClick={clearAllData}
+  //               className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+  //             >
+  //               <RefreshCw className="h-4 w-4" />
+  //               <span>Clear All</span>
+  //             </button>
+  //             <button
+  //               onClick={exportData}
+  //               className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+  //               title="Export as Word Document"
+  //             >
+  //               <Download className="h-4 w-4" />
+  //               <span>Export Word Doc</span>
+  //             </button>
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </div>
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
             <div className="flex items-center space-x-3">
               <Calculator className="h-8 w-8 text-blue-600" />
               <div>
@@ -1553,17 +1586,17 @@ const BreakEvenCalculator: React.FC = () => {
                 <p className="text-gray-600">BulaBook's Financial Analysis Tool</p>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
               <button
                 onClick={clearAllData}
-                className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                className="flex items-center justify-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
               >
                 <RefreshCw className="h-4 w-4" />
                 <span>Clear All</span>
               </button>
               <button
                 onClick={exportData}
-                className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex items-center justify-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                 title="Export as Word Document"
               >
                 <Download className="h-4 w-4" />
