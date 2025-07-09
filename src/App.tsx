@@ -1607,7 +1607,7 @@ const BreakEvenCalculator: React.FC = () => {
         </div>
       </div>
 
-      {/* Navigation Tabs */}
+      {/* Navigation Tabs
       <div className="bg-white border-b">
         <div className="container mx-auto px-4">
           <nav className="flex space-x-8">
@@ -1631,6 +1631,68 @@ const BreakEvenCalculator: React.FC = () => {
               ) : (
                 <tab.icon className="h-4 w-4" />
               )}
+                <span>{tab.label}</span>
+              </button>
+            ))}
+          </nav>
+        </div>
+      </div> */}
+
+      {/* Navigation Tabs */}
+      <div className="bg-white border-b">
+        <div className="container mx-auto px-4">
+          <nav className="hidden sm:flex space-x-8">
+            {[
+              { id: 'expenses', label: 'Expenses', icon: () => <span style={{ fontWeight: 'bold' }}>R</span> },
+              { id: 'products', label: 'Products', icon: Package },
+              { id: 'results', label: 'Results', icon: TrendingUp },
+              { id: 'scenarios', label: 'Scenarios', icon: BarChart3 }
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`flex items-center space-x-2 py-4 px-2 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === tab.id
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                {tab.id === 'expenses' ? (
+                  <DollarSign className="h-4 w-4" />
+                ) : (
+                  <tab.icon className="h-4 w-4" />
+                )}
+                <span>{tab.label}</span>
+              </button>
+            ))}
+          </nav>
+          
+          {/* Mobile Navigation - 2x2 Grid */}
+          <nav className="sm:hidden grid grid-cols-2 gap-1">
+            {[
+              [
+                { id: 'expenses', label: 'Expenses', icon: () => <span style={{ fontWeight: 'bold' }}>R</span> },
+                { id: 'products', label: 'Products', icon: Package }
+              ],
+              [
+                { id: 'results', label: 'Results', icon: TrendingUp },
+                { id: 'scenarios', label: 'Scenarios', icon: BarChart3 }
+              ]
+            ].flat().map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`flex items-center justify-center space-x-2 py-3 px-2 font-medium text-sm transition-colors border-b-2 ${
+                  activeTab === tab.id
+                    ? 'border-blue-500 text-blue-600 bg-blue-50'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                {tab.id === 'expenses' ? (
+                  <DollarSign className="h-4 w-4" />
+                ) : (
+                  <tab.icon className="h-4 w-4" />
+                )}
                 <span>{tab.label}</span>
               </button>
             ))}
